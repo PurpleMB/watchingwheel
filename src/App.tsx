@@ -13,6 +13,28 @@ function App() {
   const [stage, setStage] = useState<Stage>({ name: "selectShow" });
   const currentStageIndex = STEPS.findIndex((step) => step.name === stage.name);
 
+  function handleStepSelect(stageIndex: number) {
+    setStage((stage) => {
+      const currentIndex = STEPS.findIndex((step) => step.name === stage.name);
+      const targetStage = STEPS[stageIndex];
+
+      if (!targetStage || currentIndex <= stageIndex) {
+        return stage;
+      }
+
+      switch (targetStage.name) {
+        case "selectShow":
+          return { name: "selectShow" };
+        case "selectEpisode":
+          if (stage.name === "displayResults") {
+            return { name: "selectEpisode", show: stage.episode.show };
+          }
+        case "displayResults":
+          return stage;
+      }
+    });
+  }
+
   function renderStage() {
     switch (stage.name) {
       case "selectShow":
@@ -64,7 +86,11 @@ function App() {
       </div>
 
       <div className="step-display-container">
-        <StepDisplay steps={STEPS} currentStepIndex={currentStageIndex} />
+        <StepDisplay
+          steps={STEPS}
+          currentStepIndex={currentStageIndex}
+          onStepSelect={handleStepSelect}
+        />
       </div>
 
       <main className="main-content">{renderStage()}</main>
