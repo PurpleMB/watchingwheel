@@ -8,6 +8,7 @@ interface WheelProps {
   radius: number;
   items: string[];
   colors?: string[];
+  isSpinLocked: boolean;
   onSpinStateChange: (isSpinning: boolean) => void;
   onResult: (winningIndex: number) => void;
 }
@@ -16,6 +17,7 @@ function Wheel({
   radius,
   items,
   colors,
+  isSpinLocked,
   onSpinStateChange,
   onResult,
 }: WheelProps) {
@@ -73,12 +75,12 @@ function Wheel({
   useEffect(() => () => window.clearTimeout(resultTimeout.current), []);
 
   function spinWheel(rotationDegrees: number) {
-    if (isSpinning || items.length === 0) return;
+    if ((isSpinLocked && isSpinning) || items.length === 0) return;
 
     winningIndex.current = Math.floor(Math.random() * items.length);
 
     const sliceAngle = 360 / items.length;
-    const jitter = (Math.random() - 0.5) * sliceAngle * 0.9; // Final multiplier keeps it from landing too close to the edge of a slice.
+    const jitter = (Math.random() - 0.5) * sliceAngle * 0.95; // Final multiplier keeps it from landing too close to the edge of a slice.
     const targetRotation = (winningIndex.current! + 0.5) * sliceAngle + jitter; // +0.5 centers it within the slice
     const extraSpins = 360 * (Math.floor(Math.random() * 3) + 3); // adds 3-5 extra spins to the wheel for variation
 
@@ -101,7 +103,11 @@ function Wheel({
       <div className="wheel-wrapper">
         <div
           className={`wheel ${isSpinning ? "wheel--spinning" : ""}`}
-          style={{ transform: `rotate(${rotation}deg)`, background }}
+          style={{
+            transform: `rotate(${rotation}deg)`,
+            background,
+            cursor: isSpinLocked && isSpinning ? "not-allowed" : "pointer",
+          }}
           onClick={() => spinWheel(1440)}
           onTransitionEnd={(e) => {
             if (e.target !== e.currentTarget) return;

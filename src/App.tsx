@@ -1,6 +1,7 @@
 import "./App.css";
 import { useState } from "react";
 import type { Stage } from "./types/stage";
+import { WHEEL_STANDARD } from "./constants/palettes";
 import Wheel from "./components/Wheel";
 import ShowSelection from "./stages/ShowSelection";
 import EpisodeSelection from "./stages/EpisodeSelection";
@@ -54,6 +55,8 @@ function App() {
           <Wheel
             radius={40}
             items={["w", "H", "E", "E", "L"]}
+            colors={WHEEL_STANDARD}
+            isSpinLocked={false}
             onSpinStateChange={() => {}}
             onResult={() => {}}
           />
