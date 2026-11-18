@@ -4,6 +4,16 @@ import { getShowEpisodeList } from "../api/tvMaze";
 import Wheel from "../components/Wheel";
 import SeasonDropdown from "../components/SeasonDropdown";
 import { WHEEL_STANDARD } from "../constants/palettes";
+import { Button } from "react-bootstrap";
+
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
 interface EpisodeSelectionProps {
   show: Show;
@@ -24,7 +34,9 @@ function EpisodeSelection({
   const seasons = [...new Set(episodes.map((ep) => ep.season))].sort(
     (a, b) => a - b,
   );
-  const seasonEpisodes = episodes.filter((ep) => ep.season === selectedSeason);
+  const seasonEpisodes = episodes.filter((ep) => ep.season === selectedSeason || selectedSeason === null);
+  const shuffledSeasonEpisodes = shuffleArray<Episode>(seasonEpisodes);
+  const wheelItems = shuffledSeasonEpisodes.map((ep) => ep.name);
 
   useEffect(() => {
     let active = true;
@@ -68,23 +80,31 @@ function EpisodeSelection({
         disabled={isLoading || isSpinning}
       />
 
+      <Button 
+        type="button" 
+        onClick={() => setEpisodes(shuffleArray(episodes))}
+        disabled={isLoading || isSpinning}
+      >
+        <i className="bi bi-shuffle"></i> Shuffle Episodes
+      </Button>
+
       {isLoading && <p>Loading episodes...</p>}
 
       {!isLoading &&
-        episodes.filter((ep) => ep.season === selectedSeason).length === 0 && (
+        seasonEpisodes.length === 0 && (
           <p>No episodes available for this season.</p>
         )}
 
       {!isLoading &&
-        episodes.filter((ep) => ep.season === selectedSeason).length > 0 && (
+        seasonEpisodes.length > 0 && (
           <Wheel
             radius={250}
-            items={seasonEpisodes.map((ep) => ep.name)}
+            items={wheelItems}
             colors={WHEEL_STANDARD}
             isSpinLocked={true}
             onSpinStateChange={setIsSpinning}
-            onResult={(winningEpisodeIndex) =>
-              onSelectEpisode(seasonEpisodes[winningEpisodeIndex])
+            onResult={(winningEpisodeName) =>
+              onSelectEpisode(seasonEpisodes.find((ep) => ep.name === winningEpisodeName)!)
             }
           />
         )}

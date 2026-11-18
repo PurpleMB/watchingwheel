@@ -3,7 +3,7 @@ import "./SeasonDropdown.css";
 interface SeasonDropdownProps {
   seasons: number[];
   selectedSeason: number | null;
-  onSelectSeason: (season: number) => void;
+  onSelectSeason: (season: number | null) => void;
   disabled?: boolean;
 }
 
@@ -18,20 +18,18 @@ function SeasonDropdown({
       <label htmlFor="season-select">Season:</label>
       <select
         id="season-select"
-        value={selectedSeason ?? ""}
+        value={selectedSeason ?? "null"}
         disabled={disabled || seasons.length === 0}
-        onChange={(e) => onSelectSeason(Number(e.target.value))}
+        onChange={(e) => onSelectSeason(e.target.value === "null" ? null : Number(e.target.value))}
       >
-        {selectedSeason === null && (
-          <option value="" disabled>
-            Select a season
-          </option>
-        )}
         {seasons.map((season) => (
           <option key={season} value={season}>
             {season === 0 ? "Specials" : `Season ${season}`}
           </option>
         ))}
+        <option key={"any"} value="null">
+          Any Season
+        </option>
       </select>
     </div>
   );

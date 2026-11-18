@@ -3,6 +3,7 @@ import "./Wheel.css";
 
 const RESULT_DELAY_MS = 800;
 const POINTER_ANGLE = 90; // Degrees CW from top of wheel
+const MAX_WHEEL_ITEMS = 24;
 
 interface WheelProps {
   radius: number;
@@ -10,7 +11,7 @@ interface WheelProps {
   colors?: string[];
   isSpinLocked: boolean;
   onSpinStateChange: (isSpinning: boolean) => void;
-  onResult: (winningIndex: number) => void;
+  onResult: (winningItem: string) => void;
 }
 
 function Wheel({
@@ -27,6 +28,8 @@ function Wheel({
   const resultTimeout = useRef<number | undefined>(undefined);
 
   let background = "white";
+
+  items = items.slice(0, MAX_WHEEL_ITEMS);
   if (items.length > 0) {
     const sliceAngle = 360 / items.length;
     const blendAngle = Math.min(0.25, sliceAngle / 4);
@@ -114,7 +117,7 @@ function Wheel({
             resultTimeout.current = window.setTimeout(() => {
               setIsSpinning(false);
               onSpinStateChange(false);
-              onResult(winningIndex.current!);
+              onResult(items[winningIndex.current!]);
             }, RESULT_DELAY_MS);
           }}
         >
