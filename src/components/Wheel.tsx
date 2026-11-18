@@ -5,9 +5,14 @@ const RESULT_DELAY_MS = 800;
 const POINTER_ANGLE = 90; // Degrees CW from top of wheel
 const MAX_WHEEL_ITEMS = 24;
 
+interface WheelItem {
+  label: string;
+  id: string;
+}
+
 interface WheelProps {
   radius: number;
-  items: string[];
+  items: WheelItem[];
   colors?: string[];
   isSpinLocked: boolean;
   onSpinStateChange: (isSpinning: boolean) => void;
@@ -117,7 +122,7 @@ function Wheel({
             resultTimeout.current = window.setTimeout(() => {
               setIsSpinning(false);
               onSpinStateChange(false);
-              onResult(items[winningIndex.current!]);
+              onResult(items[winningIndex.current!].id);
             }, RESULT_DELAY_MS);
           }}
         >
@@ -131,7 +136,7 @@ function Wheel({
                   transform: `translateY(-50%) rotate(${angle - 90}deg)`,
                 }}
               >
-                <span className="wheel__label-text">{item}</span>
+                <span className="wheel__label-text">{item.label}</span>
               </span>
             );
           })}

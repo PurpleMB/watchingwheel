@@ -76,7 +76,7 @@ function App() {
         <div className="header__wheel" aria-hidden="true">
           <Wheel
             radius={40}
-            items={["w", "H", "E", "E", "L"]}
+            items={["w", "H", "E", "E", "L"].map((item, index) => ({ id: String(index), label: item }))}
             colors={WHEEL_STANDARD}
             isSpinLocked={false}
             onSpinStateChange={() => {}}

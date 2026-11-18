@@ -34,9 +34,13 @@ function EpisodeSelection({
   const seasons = [...new Set(episodes.map((ep) => ep.season))].sort(
     (a, b) => a - b,
   );
-  const seasonEpisodes = episodes.filter((ep) => ep.season === selectedSeason || selectedSeason === null);
-  const shuffledSeasonEpisodes = shuffleArray<Episode>(seasonEpisodes);
-  const wheelItems = shuffledSeasonEpisodes.map((ep) => ep.name);
+  const seasonEpisodes = episodes.filter(
+    (ep) => ep.season === selectedSeason || selectedSeason === null
+  );
+  const wheelItems = seasonEpisodes.map((ep) => ({
+    name: ep.name,
+    id: String(ep.id),
+  }));
 
   useEffect(() => {
     let active = true;
@@ -54,7 +58,7 @@ function EpisodeSelection({
           (a, b) => a - b,
         );
 
-        setEpisodes(episodes);
+        setEpisodes(shuffleArray(episodes));
         setSelectedSeason(seasons[0] ?? null);
       })
       .catch((error: unknown) => {
@@ -99,13 +103,20 @@ function EpisodeSelection({
         seasonEpisodes.length > 0 && (
           <Wheel
             radius={250}
-            items={wheelItems}
+            items={
+              wheelItems.map((item) => ({ id: item.id, label: item.name }))
+            }
             colors={WHEEL_STANDARD}
             isSpinLocked={true}
             onSpinStateChange={setIsSpinning}
-            onResult={(winningEpisodeName) =>
-              onSelectEpisode(seasonEpisodes.find((ep) => ep.name === winningEpisodeName)!)
-            }
+            onResult={(winningId) => {
+              const episode = seasonEpisodes.find(
+                (ep) => String(ep.id) === winningId
+              );
+              if (episode) {
+                onSelectEpisode(episode);
+              }
+            }}
           />
         )}
 
